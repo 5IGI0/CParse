@@ -156,7 +156,7 @@ int parse_numeric(char const *data, cparse_token_t *token) {
     }
 
     if (endptr[0] == '.') {
-        token->d.dbl = strtod(data, &endptr);
+        token->d.fp = strtod(data, &endptr);
         assert(IS_IDENTIFIER_CHAR(endptr[0]) == 0|| endptr[0] == 'f' || endptr[0] == 'F');
         if (endptr[0] == 'f' || endptr[0] == 'F') {
             endptr++;
@@ -278,7 +278,7 @@ int check_for_empty_line(char const *data, size_t index) {
 }
 
 static inline
-int parse_preproc_diractive(char const *data, cparse_token_t *token) {
+int parse_preproc_directive(char const *data, cparse_token_t *token) {
     size_t l = 1;
 
     assert(data[0] == '#');
@@ -302,6 +302,7 @@ int parse_preproc_diractive(char const *data, cparse_token_t *token) {
             data+l, ll);
         l+=ll+(data[l+ll]!= 0);
         token->d.byte_array.len += ll;
+        token->d.byte_array.data[token->d.byte_array.len] = 0;
         if (token->d.byte_array.data[token->d.byte_array.len-1] == '\\') {
             token->d.byte_array.data[token->d.byte_array.len-1] = ' ';
         } else {
@@ -327,7 +328,7 @@ int cparse_tokenize(char const *data, cparse_token_t **tokens) {
         memset(&token, 0, sizeof(token));
 
         if (data[index] == '#' && (index == 0 || check_for_empty_line(data, index-1))) {
-            ret = parse_preproc_diractive(data+index, &token);
+            ret = parse_preproc_directive(data+index, &token);
         } else if (data[index] == '/' && data[index+1] == '/')
             ret = parse_oneline_comment(data+index, &token);
         else if (data[index] == '/' && data[index+1] == '*')
@@ -355,8 +356,9 @@ int cparse_tokenize(char const *data, cparse_token_t **tokens) {
         token.pos = index;
         index += ret;
 
-        assert(tokens[0] = realloc(tokens[0], sizeof(token)*(token_count+1)));
+        assert(tokens[0] = realloc(tokens[0], sizeof(token)*(token_count+2)));
         tokens[0][token_count] = token;
+        tokens[0][token_count+1].type = CTOKEN_END;
         token_count++;
     }
 

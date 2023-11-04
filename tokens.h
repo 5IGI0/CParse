@@ -5,25 +5,33 @@
 #include <stdint.h>
 
 // PRIMARY TYPES
-#define CTOKEN_KEYWORD          1
-#define CTOKEN_LITERAL          2
-#define CTOKEN_IDENTIFER        3
-#define CTOKEN_OPERATOR         4 // everything that has precedence
-#define CTOKEN_COMMENT          5
-#define CTOKEN_CONTROL_FLOW     6
-#define CTOKEN_PREPROC_DIR      7
-#define CTOKEN_PRIMTYP_WIDTH    3
+#define CTOKEN_END                          0
+#define CTOKEN_KEYWORD                      1
+#define CTOKEN_LITERAL                      2
+#define CTOKEN_IDENTIFER                    3
+#define CTOKEN_OPERATOR                     4 // everything that has precedence
+#define CTOKEN_COMMENT                      5
+#define CTOKEN_CONTROL_FLOW                 6
+#define CTOKEN_PREPROC_DIR                  7
+#define CTOKEN_PRIMTYP_WIDTH                3
+#define CTOKEN_PRIMTYP_MASK                 ((1u<<CTOKEN_PRIMTYP_WIDTH)-1)
+#define CTOKEN_IS_PRIMTYPE(_type,_primtype) (((_type)&CTOKEN_PRIMTYP_MASK)==(_primtype))
 
 // COMMENT TYPES
 #define CTOKEN_COMMENT_ONELINE      ((1 << CTOKEN_PRIMTYP_WIDTH) | CTOKEN_COMMENT) // c comments
 #define CTOKEN_COMMENT_MULTILINE    ((2 << CTOKEN_PRIMTYP_WIDTH) | CTOKEN_COMMENT) // cpp comments
 
 // LITERAL TYPES
-#define CTOKEN_LIT_INT      ((1 << CTOKEN_PRIMTYP_WIDTH) | CTOKEN_LITERAL)
-#define CTOKEN_LIT_STR      ((2 << CTOKEN_PRIMTYP_WIDTH) | CTOKEN_LITERAL)
-#define CTOKEN_LIT_FLOAT    ((3 << CTOKEN_PRIMTYP_WIDTH) | CTOKEN_LITERAL)
-#define CTOKEN_LIT_DOUBLE   ((4 << CTOKEN_PRIMTYP_WIDTH) | CTOKEN_LITERAL)
-#define CTOKEN_LIT_WIDTH    (CTOKEN_PRIMTYP_WIDTH+3)
+#define CTOKEN_LIT_INT              ((1 << CTOKEN_PRIMTYP_WIDTH) | CTOKEN_LITERAL)
+#define CTOKEN_LIT_STR              ((2 << CTOKEN_PRIMTYP_WIDTH) | CTOKEN_LITERAL)
+#define CTOKEN_LIT_FP               ((3 << CTOKEN_PRIMTYP_WIDTH) | CTOKEN_LITERAL)
+#define CTOKEN_LIT_WIDTH            (CTOKEN_PRIMTYP_WIDTH+2)
+#define CTOKEN_LIT_MASK             ((1u<<CTOKEN_LIT_WIDTH)-1)
+#define CTOKEN_IS_LIT(_type,_lit)   (((_type)&CTOKEN_LIT_MASK)==(_lit))
+
+// FLOATING POINT TYPES
+#define CTOKEN_LIT_FLOAT    ((3 << CTOKEN_LIT_WIDTH) | CTOKEN_LIT_FP)
+#define CTOKEN_LIT_DOUBLE   ((4 << CTOKEN_LIT_WIDTH) | CTOKEN_LIT_FP)
 
 // INT LITERAL TYPES
 #define CTOKEN_DEC_INT_LITERAL  ((1 << CTOKEN_LIT_WIDTH) | CTOKEN_LIT_INT)
@@ -154,10 +162,10 @@ typedef struct {
     size_t  pos;
     size_t  len;
     union {
-        uint64_t     integer;
-        double      dbl;
+        uint64_t    integer;
+        double      fp;
         struct {
-            size_t len;
+            size_t  len;
             uint8_t *data;
         } byte_array;
     } d;

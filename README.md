@@ -17,7 +17,7 @@ typedef struct {
     size_t  len;
     union {
         uint64_t    integer;
-        double      dbl;
+        double      fp;
         struct {
             size_t      len;
             uint8_t     *data;
@@ -41,16 +41,17 @@ For additional details and examples, please refer to the library's source code.
 
 ## TODO
 
-- [ ] **String/Character Prefixes and Integers:**
+- [ ] **Tokenization:**
   - [ ] U, u, L prefix support
   - [ ] Integer suffix support
-
-- [ ] **Unicode Escape Sequences:**
   - [ ] "\u" escape sequence support
   - [ ] "\U" escape sequence support
+  - [ ] Preprocessor directive support
 
 - [ ] **Token Management:**
   - [ ] Implement token memory management
+    - [x] free
+    - [ ] copy
   - [ ] Develop token stringification
 
 - [ ] **Code Tree Design:**
