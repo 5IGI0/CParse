@@ -272,9 +272,10 @@ int check_for_empty_line(char const *data, size_t index) {
             return 1;
         if (isspace(data[index]) == 0)
             return 0;
+        index--;
     }
 
-    return isspace(index);
+    return isspace(data[index]);
 }
 
 static inline
