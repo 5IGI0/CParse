@@ -66,6 +66,7 @@ int parse_identifier(char const *data, cparse_token_t *token) {
     assert(token->d.byte_array.data = malloc(l+1));
     memcpy(token->d.byte_array.data, data, l);
     token->d.byte_array.data[l] = 0;
+    token->d.byte_array.len = l;
 
     return l;
 }
@@ -73,8 +74,8 @@ int parse_identifier(char const *data, cparse_token_t *token) {
 static inline
 int parse_operator(char const *data, cparse_token_t *token) {
     token->len=3;
-    if (data[0] == '<' && data[1] == '<' && data[2] == '=')     {token->type=CTOKEN_LSHIFT_ASSIGNMENT;return 2;} // <<=
-    else if (data[0] == '>' && data[1] == '>' && data[2] == '='){token->type=CTOKEN_RSHIFT_ASSIGNMENT;return 2;} // >>=
+    if (data[0] == '<' && data[1] == '<' && data[2] == '=')     {token->type=CTOKEN_LSHIFT_ASSIGNMENT;return 3;} // <<=
+    else if (data[0] == '>' && data[1] == '>' && data[2] == '='){token->type=CTOKEN_RSHIFT_ASSIGNMENT;return 3;} // >>=
 
     token->len=2;
     if (data[0] == '-' && data[1] == '>')       {token->type=CTOKEN_ARROW;              return 2;} // ->
@@ -94,6 +95,8 @@ int parse_operator(char const *data, cparse_token_t *token) {
     else if (data[0] == '&' && data[1] == '=')  {token->type=CTOKEN_BITAND_ASSIGNMENT;  return 2;} // &=
     else if (data[0] == '^' && data[1] == '=')  {token->type=CTOKEN_BITXOR_ASSIGNMENT;  return 2;} // ^=
     else if (data[0] == '|' && data[1] == '=')  {token->type=CTOKEN_BITOR_ASSIGNMENT;   return 2;} // |=
+    else if (data[0] == '+' && data[1] == '+')  {token->type=CTOKEN_INCREMENT;          return 2;} // ++
+    else if (data[0] == '-' && data[1] == '-')  {token->type=CTOKEN_DECREMENT;          return 2;} // --
 
     token->len = 1;
     switch (data[0]) {

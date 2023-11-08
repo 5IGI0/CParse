@@ -4,6 +4,7 @@
 #include "tokens.h"
 
 const cparse_keyword_meta_t *cparse_get_keyword_by_name(char const *name, size_t l);
+const cparse_keyword_meta_t *cparse_get_keyword_by_type(int type);
 
 typedef enum {
     CTOKEN_DATATYPE_NO_DATA     = 0,

@@ -11,9 +11,17 @@ const cparse_keyword_meta_t *cparse_get_keyword_by_name(char const *name, size_t
     return NULL;
 }
 
+const cparse_keyword_meta_t *cparse_get_keyword_by_type(int type) {
+    for (size_t i = 0; i < CTOKEN_KEYWORD_COUNT; i++) {
+        if (cparse_keyword_tbl[i].type == type)
+            return cparse_keyword_tbl+i;
+    }
+    return NULL;
+}
+
 cparse_token_datatype_t cparse_get_datatype_from_type(int type) {
     if (
-        CTOKEN_IS_PRIMTYPE(type, CTOKEN_IDENTIFER)        ||
+        CTOKEN_IS_PRIMTYPE(type, CTOKEN_IDENTIFER)      ||
         CTOKEN_IS_PRIMTYPE(type, CTOKEN_COMMENT)        ||
         CTOKEN_IS_PRIMTYPE(type, CTOKEN_PREPROC_DIR)    ||
         CTOKEN_IS_LIT(type, CTOKEN_LIT_STR)    

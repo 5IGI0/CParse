@@ -86,6 +86,9 @@
 #define CTOKEN_BITOR_ASSIGNMENT     ((38 << CTOKEN_PRIMTYP_WIDTH) | CTOKEN_OPERATOR)
 #define CTOKEN_BITXOR_ASSIGNMENT    ((39 << CTOKEN_PRIMTYP_WIDTH) | CTOKEN_OPERATOR)
 #define CTOKEN_COMMA                ((40 << CTOKEN_PRIMTYP_WIDTH) | CTOKEN_OPERATOR)
+#define CTOKEN_INCREMENT            ((41 << CTOKEN_PRIMTYP_WIDTH) | CTOKEN_OPERATOR)
+#define CTOKEN_DECREMENT            ((42 << CTOKEN_PRIMTYP_WIDTH) | CTOKEN_OPERATOR)
+#define CTOKEN_OPERATOR_COUNT       (42)
 
 // KEYWORD TYPES
 #define CTOKEN_KW_ALIGNAS           ((1 << CTOKEN_PRIMTYP_WIDTH) | CTOKEN_KEYWORD) // alignas
@@ -156,6 +159,7 @@ typedef struct {
 } cparse_keyword_meta_t;
 
 extern const cparse_keyword_meta_t cparse_keyword_tbl[];
+extern const char *cparse_op2str[];
 
 typedef struct {
     int     type;
