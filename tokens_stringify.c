@@ -76,7 +76,7 @@ int escape_str(char const *in, size_t len, char **str, size_t *alloclen) {
     str[0][0] = '"';
     str[0][needed+1] = '"';
     str[0][needed+2] = 0;
-    return needed;
+    return needed+2;
 }
 
 inline static

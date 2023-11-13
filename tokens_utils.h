@@ -14,4 +14,6 @@ typedef enum {
 } cparse_token_datatype_t;
 cparse_token_datatype_t cparse_get_datatype_from_type(int type);
 
+char cparse_get_needed_space(cparse_token_t *before, cparse_token_t *after);
+
 #endif // SIG_LIBCPARSE_TOKENS_UTILS_H_

@@ -37,3 +37,39 @@ cparse_token_datatype_t cparse_get_datatype_from_type(int type) {
 
     return CTOKEN_DATATYPE_NO_DATA;
 }
+
+char cparse_get_needed_space(cparse_token_t *before, cparse_token_t *after) {
+    if (before == NULL || after == NULL)
+        return 0;
+
+    int btype = before->type;
+    int atype = after->type;
+
+    switch (btype) {
+        case CTOKEN_PREPROC_DIR:        return '\n';
+        case CTOKEN_COMMENT_ONELINE:    return '\n';
+        case CTOKEN_COMMENT_MULTILINE:  return '\0';
+        case CTOKEN_CHR_INT_LITERAL:    return '\0';
+        case CTOKEN_LIT_STR:            return '\0'; // TODO: check for not prefixed string (L"foo", ...)
+        default:break;
+    }
+
+    switch (atype) {
+        case CTOKEN_PREPROC_DIR:        return '\n';
+        case CTOKEN_CHR_INT_LITERAL:    return '\0';
+        case CTOKEN_LIT_STR:            return '\0'; // TODO: check for not prefixed string (L"foo", ...)
+        case CTOKEN_COMMENT_ONELINE:    return '\0';
+        case CTOKEN_COMMENT_MULTILINE:  return '\0';
+        default: break;
+    }
+
+    if (
+        CTOKEN_IS_PRIMTYPE(btype,CTOKEN_OPERATOR)       ||
+        CTOKEN_IS_PRIMTYPE(btype,CTOKEN_CONTROL_FLOW)   ||
+        CTOKEN_IS_PRIMTYPE(atype,CTOKEN_OPERATOR)       ||
+        CTOKEN_IS_PRIMTYPE(atype,CTOKEN_CONTROL_FLOW)   ||
+        CTOKEN_IS_PRIMTYPE(atype,CTOKEN_COMMENT)
+    )   return 0;
+
+    return ' ';
+}
