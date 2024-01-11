@@ -6,7 +6,6 @@
 #include <assert.h>
 
 #include "tokens.h"
-#include "tokens_utils.h"
 
 #define IS_IDENTIFIER_FIRST_CHAR(c) ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_')
 #define IS_IDENTIFIER_CHAR(c) ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || (c >= '0' && c <= '9'))

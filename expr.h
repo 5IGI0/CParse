@@ -22,6 +22,12 @@ typedef struct cparse_expr_node_s {
   struct cparse_expr_node_s *right_operand;
 } cparse_expr_node_t;
 
+int   parse_expr(cparse_token_t *tokens, size_t token_count, cparse_expr_node_t *opts);
+void  free_expr(cparse_expr_node_t *expr, int flags);
+
+#define CPARSE_FREE_EXPR_FREE_ROOT    1
+#define CPARSE_FREE_EXPR_FREE_TOKENS  2
+
 // process purpose types
 #define CPARSE_EXPR_NODE_RAW_TOKEN          -1
 #define CPARSE_EXPR_NODE_RAW_CHILD          -2

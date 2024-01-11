@@ -1,7 +1,6 @@
 #include <stdlib.h>
 
 #include "tokens.h"
-#include "tokens_utils.h"
 
 void cparse_free_token(cparse_token_t *token, int free_ptr) {
     cparse_token_datatype_t dt = cparse_get_datatype_from_type(token->type);

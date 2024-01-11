@@ -10,27 +10,27 @@ Do not use this library for any production purposes._
 
 CParse provides the following prototypes and structures:
 ```c
+// cf. tokens.h
+cparse_token_t;
+cparse_keyword_meta_t;
+cparse_token_datatype_t;
 
-typedef struct {
-    int     type; // Check tokens.h for more details
-    size_t  pos;
-    size_t  len;
-    union {
-        uint64_t    integer;
-        double      fp;
-        struct {
-            size_t      len;
-            uint8_t     *data;
-        } byte_array;
-    } d;
-} cparse_token_t;
+int                         cparse_tokenize(char const *data, cparse_token_t **tokens);
+void                        cparse_free_token(cparse_token_t *token, int free_ptr);
+const cparse_keyword_meta_t *cparse_get_keyword_by_name(char const *name, size_t l);
+const cparse_keyword_meta_t *cparse_get_keyword_by_type(int type);
+cparse_token_datatype_t     cparse_get_datatype_from_type(int type);
+char                        cparse_get_needed_space(cparse_token_t *before, cparse_token_t *after);
+char                        *cparse_stringify_token(cparse_token_t token);
+int                         cparse_stringify_token_r(cparse_token_t token, char **str, size_t *alloclen);
+void                        cparse_free_token(cparse_token_t *token, int free_ptr);
+void                        cparse_free_token_array(cparse_token_t **tokens);
 
-int cparse_tokenize(char const *data, cparse_token_t **tokens);
+// cf. expr.h
+cparse_expr_node_t;
+int   parse_expr(cparse_token_t *tokens, size_t token_count, cparse_expr_node_t *opts);
+void  free_expr(cparse_expr_node_t *expr, int flags);
 ```
-
-Features
-- `cparse_token_t` structure, which contains information about parsed tokens, such as type, position, length, and data.
-- `cparse_tokenize` function, which tokenizes C code and populates an array of cparse_token_t objects.
 
 ## Usage
 
@@ -40,6 +40,17 @@ _The library is not meant for standalone usage and should be integrated into you
 For additional details and examples, please refer to the library's source code.
 
 ## TODO
+
+- [ ] **Documentation**
+  - [ ] Add doxygen comments to all structures and functions
+
+- [x] **Expressions:**
+  - [x] Expressions tree
+  - [x] Parse expressions (in theory)
+  - [ ] Implement expression memory management
+    - [x] free
+    - [ ] copy
+    - [ ] copy input's tokens
 
 - [ ] **Tokenization:**
   - [ ] U, u, L prefix support
@@ -52,7 +63,7 @@ For additional details and examples, please refer to the library's source code.
   - [ ] Implement token memory management
     - [x] free
     - [ ] copy
-  - [ ] Develop token stringification
+  - [x] Develop token stringification
 
 - [ ] **Code Tree Design:**
   - [ ] Plan and implement code tree structure

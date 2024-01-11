@@ -5,7 +5,6 @@
 #include <assert.h>
 
 #include "tokens.h"
-#include "tokens_utils.h"
 
 inline static
 int auto_alloc(char **str, size_t *alloclen, size_t needed) {
@@ -131,7 +130,7 @@ int int2str(int type, uint64_t num, char **str, size_t *alloclen) {
     return prefix_len+s;
 }
 
-int cparse_stringify_token(cparse_token_t token, char **str, size_t *alloclen) {
+int cparse_stringify_token_r(cparse_token_t token, char **str, size_t *alloclen) {
     if (CTOKEN_IS_PRIMTYPE(token.type,CTOKEN_KEYWORD)) {
         cparse_keyword_meta_t const *meta = cparse_get_keyword_by_type(token.type);
 
@@ -217,4 +216,13 @@ int cparse_stringify_token(cparse_token_t token, char **str, size_t *alloclen) {
     }
     
     return -__LINE__;
+}
+
+
+char    *cparse_stringify_token(cparse_token_t token) {
+    static size_t alloclen = 0;
+    static char *str = NULL;
+    if (cparse_stringify_token_r(token, &str, &alloclen) < 0)
+        return NULL;
+    return str;
 }

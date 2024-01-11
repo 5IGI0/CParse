@@ -12,10 +12,17 @@ printf("%s", prefix);                   \
 for (size_t i = 0; i < count; i++) {    \
     printf("%d:%d, ", (nodes)[i].type, ((nodes)[i].type==CPARSE_EXPR_NODE_RAW_TOKEN)?(nodes)[i].tokens[0].type:0);    \
 }                                       \
-puts("");                       
+puts("");        
 
 int parse_expr(cparse_token_t *tokens, size_t token_count, cparse_expr_node_t *opts);
 int resolv_unresolved_nodes(cparse_expr_node_t *root);
+
+static inline int easy_fail(cparse_expr_node_t *node, size_t node_count, int ret) {
+    for (size_t i = 0; i < node_count; i++) {
+        free_expr(&node[i], 0);
+    }
+    return free(node), ret;
+}
 
 static inline int is_value(cparse_expr_node_t node) {
     return (
@@ -160,7 +167,12 @@ static int  parse_opt_level_1(cparse_expr_node_t *nodes, int *node_count, int *p
         if (nodes[tmp_pos].tokens[1].type != CTOKEN_RND_CLOSE_BRKT) {
             assert(nodes[tmp_pos].right_operand = calloc(1, sizeof(*nodes)));
             int ret = parse_expr(nodes[tmp_pos].tokens+1, nodes[tmp_pos].token_count-2, nodes[tmp_pos].right_operand);
-            assert(ret == 0);
+            if (ret != 0) {
+                free(nodes[tmp_pos].right_operand);
+                nodes[tmp_pos].right_operand = NULL;
+                return -1;
+            }
+            
         }
         
         return merge_nodes(nodes, node_count, pos, MERGE_LEFT);
@@ -443,46 +455,47 @@ int parse_expr(cparse_token_t *tokens, size_t token_count, cparse_expr_node_t *o
     }
 
     for (int i = 0; i < node_count; i++) {
-        assert(parse_opt_level_1(tmp_expr, &node_count, &i) == 0);
+        if (parse_opt_level_1(tmp_expr, &node_count, &i) != 0)
+            return easy_fail(tmp_expr, node_count, -__LINE__);
     }
     
     for (int i = node_count-1; i >= 0; i--) {
-        assert(parse_opt_level_2(tmp_expr, &node_count, &i) == 0);
+        if (parse_opt_level_2(tmp_expr, &node_count, &i) != 0)
+            return easy_fail(tmp_expr, node_count, -__LINE__);
     }
 
     for (size_t lvl = 3; lvl <= 12; lvl++) {
         // can't be operation at the begin or at the end
         for (int i = 1; i < node_count-1; i++) {
-            assert(parse_opt_level_n(tmp_expr, &node_count, &i, lvl) == 0);
+            if (parse_opt_level_n(tmp_expr, &node_count, &i, lvl) != 0)
+                return easy_fail(tmp_expr, node_count, -__LINE__);
         }
     }
 
     for (int i = node_count-1; i >= 0; i--) {
-        assert(parse_opt_level_13(tmp_expr, &node_count, &i) == 0);
+        if (parse_opt_level_13(tmp_expr, &node_count, &i) != 0)
+            return easy_fail(tmp_expr, node_count, -__LINE__);
     }
 
     for (int i = node_count-1; i >= 0; i--) {
-        assert(parse_opt_level_n(tmp_expr, &node_count, &i, 14) == 0);
+        if (parse_opt_level_n(tmp_expr, &node_count, &i, 14) != 0)
+            return easy_fail(tmp_expr, node_count, -__LINE__);
     }
 
     // can't be operation at the begin or at the end
     for (int i = 1; i < node_count-1; i++) {
-        assert(parse_opt_level_n(tmp_expr, &node_count, &i, 15) == 0);
+        if (parse_opt_level_n(tmp_expr, &node_count, &i, 15) != 0)
+            return easy_fail(tmp_expr, node_count, -__LINE__);
     }
     
-    if (node_count != 1) {
-        // TODO: free nodes
-        return free(tmp_expr), -__LINE__;
-    }
+    if (node_count != 1)
+        return easy_fail(tmp_expr, node_count, -__LINE__);
 
     int ret = resolv_unresolved_nodes(tmp_expr);
-    if (ret < 0) {
-        // TODO: free nodes
-        return free(tmp_expr), ret;
-    }
+    if (ret < 0)
+        return easy_fail(tmp_expr, node_count, -__LINE__);
 
     memcpy(opts, tmp_expr, sizeof(*opts));
-
     return free(tmp_expr), 0;
 }
 
